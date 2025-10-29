@@ -1,24 +1,67 @@
+const API_BASE = 'http://localhost:3000/todos';
+
 let btn = document.querySelector("button");
 let ul = document.querySelector("ul");
 let inp = document.querySelector("input");
 
-btn.addEventListener("click",function(){
-   let item = document.createElement("li");
-   item.innerText = inp.value;
+// Load todos on page load
+document.addEventListener('DOMContentLoaded', loadTodos);
 
-   let dltbtn = document.createElement("button");
-   dltbtn.innerText="delete"
-   dltbtn.classList.add("delete");
+async function loadTodos() {
+  try {
+    const response = await fetch(API_BASE);
+    const todos = await response.json();
+    todos.forEach(todo => addTodoToDOM(todo));
+  } catch (error) {
+    console.error('Error loading todos:', error);
+  }
+}
 
-   item.appendChild(dltbtn);
-   ul.appendChild(item);
-   inp.value="";
-});
+btn.addEventListener("click", async function(){
+  const text = inp.value.trim();
+  if (!text) return;
 
-ul.addEventListener("click", function(event){
-  if(event.target.nodeName=="BUTTON"){
-    let listitem = event.target.parentElement;
-    listitem.remove();
-    console.log("deleted")
+  try {
+    const response = await fetch(API_BASE, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    });
+    const newTodo = await response.json();
+    addTodoToDOM(newTodo);
+    inp.value = "";
+  } catch (error) {
+    console.error('Error adding todo:', error);
   }
 });
+
+ul.addEventListener("click", async function(event){
+  if(event.target.nodeName=="BUTTON" && event.target.classList.contains("delete")){
+    const listitem = event.target.parentElement;
+    const todoId = listitem.dataset.id;
+
+    try {
+      await fetch(`${API_BASE}/${todoId}`, {
+        method: 'DELETE',
+      });
+      listitem.remove();
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+    }
+  }
+});
+
+function addTodoToDOM(todo) {
+  let item = document.createElement("li");
+  item.innerText = todo.text;
+  item.dataset.id = todo._id;
+
+  let dltbtn = document.createElement("button");
+  dltbtn.innerText = "delete";
+  dltbtn.classList.add("delete");
+
+  item.appendChild(dltbtn);
+  ul.appendChild(item);
+}
