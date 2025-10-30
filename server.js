@@ -17,7 +17,7 @@ mongoose.connect(process.env.MONGODB_URI)
 .catch(err => console.error('MongoDB connection error:', err));
 
 // Serve static files (HTML, CSS, JS)
-app.use(express.static('.'));
+app.use(express.static('public'));
 
 // Routes
 app.use('/todos', todoRoutes);
