@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:3000/todos';
+const API_BASE = '/todos';
 
 let btn = document.querySelector("button");
 let ul = document.querySelector("ul");

@@ -5,7 +5,7 @@ const cors = require('cors');
 const todoRoutes = require('./routes/todos');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // Middleware
 app.use(cors());
@@ -16,11 +16,11 @@ mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-// Routes
-app.use('/todos', todoRoutes);
-
 // Serve static files (HTML, CSS, JS)
 app.use(express.static('.'));
+
+// Routes
+app.use('/todos', todoRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
